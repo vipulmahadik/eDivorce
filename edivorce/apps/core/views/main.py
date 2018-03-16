@@ -229,6 +229,13 @@ def legal(request):
     return render(request, 'legal.html', context={'active_page': 'legal'})
 
 
+def acknowledgements(request):
+    """
+    Acknowledgements page
+    """
+    return render(request, 'acknowledgements.html', context={'active_page': 'acknowledgements'})
+
+
 def __get_bceid_user(request):
     user, created = BceidUser.objects.get_or_create(user_guid=request.bceid_user.guid)
 

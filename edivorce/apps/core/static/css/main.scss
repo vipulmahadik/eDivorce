@@ -1111,12 +1111,12 @@ textarea {
 		background-size: cover;
 
 		.content-column {
-			margin: 100px auto;
-			padding: 0;
-			max-width: 800px;
-			padding: 0 20px;
+		    margin: 54px auto 100px;
+		    padding: 0 20px;
+		    max-width: 840px;
 			text-align: center;
 			color: #ffffff;
+		    position: relative;
 
 			h1,
 			h2,
@@ -1173,13 +1173,14 @@ textarea {
 
 				span.number-circle {
 					border: solid 2px white;
-					padding: 5px;
+					padding: 0;
 					border-radius: 40px;
-					width: 50px;
-					height: 50px;
+					width: 40px;
+					height: 40px;
 					display: inline-block;
 					text-align: center;
 					margin-right: 10px;
+					font-size: 21px;
 				}
 			}
 		}
@@ -1524,6 +1525,22 @@ span.hard-stop {
 	float: left;
 	margin: 3px 10px 0 0;
 }
+
+.footnote-marker {
+    font-size: 18px;
+    top: -10px;
+    position: relative;
+    display: inline-block;
+    left: 1px;
+    margin-right: 1px;
+}
+
+.footnote {
+	margin-top: 72px;
+	margin-bottom: 52px;
+	font-size: 14px;
+}
+
 /* Datepicker */
 .date-picker-group {
 	.input-group-addon {
