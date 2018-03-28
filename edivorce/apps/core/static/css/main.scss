@@ -1124,11 +1124,17 @@ textarea {
 				color: #ffffff;
 			}
 
-			h2 {
-				font-size: 30px;
-				font-weight: 600;
-				margin: 48px 0 0;
-			}
+            h2 {
+                font-size: 30px;
+                font-weight: 600;
+                margin: 42px 0 0;
+
+                &.shaded-box {
+                    padding-top: 28px;
+                    border-top-left-radius: 8px;
+                    border-top-right-radius: 8px;
+                }
+            }
 
 			.intro {
 				font-size: 24px;
@@ -1170,6 +1176,26 @@ textarea {
 				.flex-column {
 					width: 45%;
 				}
+
+
+                &.shaded-box {
+                    padding-top: 22px;
+                    padding-bottom: 50px;
+                    margin-top: 0;
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+
+                    .flex-column {
+                        &.left {
+                            padding-left: 30px;
+                        }
+
+                        &.right {
+                            padding-right: 30px;
+                        }
+
+                    }
+                }
 
 				span.number-circle {
 					border: solid 2px white;
@@ -1536,10 +1562,25 @@ span.hard-stop {
 }
 
 .footnote {
-	margin-top: 72px;
+	margin-top: 40px;
 	margin-bottom: 52px;
-	font-size: 14px;
+	font-size: 16px;
+
+    h5 {
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    &.shaded-box {
+        border-radius: 8px;
+        padding: 25px 80px 25px 80px;
+    }
 }
+
+.shaded-box {
+    background-color: rgba(0,0,0,0.35);
+}
+
 
 /* Datepicker */
 .date-picker-group {
