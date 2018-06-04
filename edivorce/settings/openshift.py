@@ -50,16 +50,16 @@ DEPLOYMENT_TYPE = os.getenv('ENVIRONMENT_TYPE')
 PROXY_URL_PREFIX = ''
 
 if DEPLOYMENT_TYPE == 'dev':
-    PROXY_URL_PREFIX = "/divorce-dev"
+    PROXY_URL_PREFIX = os.getenv('PROXY_URL_PREFIX', '/divorce-dev')
     DEBUG = True
     REGISTER_URL = 'https://www.test.bceid.ca/directories/bluepages/details.aspx?serviceID=5522'
 
 if DEPLOYMENT_TYPE == 'test':
-    PROXY_URL_PREFIX = "/divorce-test"
+    PROXY_URL_PREFIX = os.getenv('PROXY_URL_PREFIX', '/divorce-test')
     REGISTER_URL = 'https://www.test.bceid.ca/directories/bluepages/details.aspx?serviceID=5521'
 
 if DEPLOYMENT_TYPE == 'prod':
-    PROXY_URL_PREFIX = "/divorce"
+    PROXY_URL_PREFIX = os.getenv('PROXY_URL_PREFIX', '/divorce')
     REGISTER_URL = 'https://www.bceid.ca/directories/bluepages/details.aspx?serviceID=5203'
     # Google Tag Manager (Production)
     GTM_ID = 'GTM-W4Z2SPS'
