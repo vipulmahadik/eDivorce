@@ -129,3 +129,14 @@ BASICAUTH_ENABLED = False
 
 # Google Tag Manager (dev/test instance)
 GTM_ID = 'GTM-NJLR7LT'
+
+
+def show_toolbar(request):
+    return ENVIRONMENT in ['localdev', 'dev', 'minishift']
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+    'SHOW_COLLAPSED': True,
+}
+
+SECURE_BROWSER_XSS_FILTER = True
