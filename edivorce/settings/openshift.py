@@ -48,21 +48,29 @@ COMPRESS_OFFLINE = True
 DEPLOYMENT_TYPE = os.getenv('ENVIRONMENT_TYPE')
 
 PROXY_URL_PREFIX = ''
+PROXY_BASE_URL = os.getenv('PROXY_BASE_URL', 'https://justice.gov.bc.ca')
 
 if DEPLOYMENT_TYPE == 'dev':
-    PROXY_URL_PREFIX = "/divorce-dev"
+    PROXY_URL_PREFIX = os.getenv('PROXY_URL_PREFIX', '/divorce-dev')
     DEBUG = True
+    CSRF_COOKIE_AGE = None
+    SESSION_COOKIE_AGE = 3600
     REGISTER_URL = 'https://www.test.bceid.ca/directories/bluepages/details.aspx?serviceID=5522'
 
 if DEPLOYMENT_TYPE == 'test':
-    PROXY_URL_PREFIX = "/divorce-test"
+    PROXY_URL_PREFIX = os.getenv('PROXY_URL_PREFIX', '/divorce-test')
     REGISTER_URL = 'https://www.test.bceid.ca/directories/bluepages/details.aspx?serviceID=5521'
 
 if DEPLOYMENT_TYPE == 'prod':
-    PROXY_URL_PREFIX = "/divorce"
+    PROXY_URL_PREFIX = os.getenv('PROXY_URL_PREFIX', '/divorce')
     REGISTER_URL = 'https://www.bceid.ca/directories/bluepages/details.aspx?serviceID=5203'
     # Google Tag Manager (Production)
     GTM_ID = 'GTM-W4Z2SPS'
+
+if DEPLOYMENT_TYPE == 'minishift':
+    DEBUG = True
+    REGISTER_URL = '#'
+    PROXY_BASE_URL = ''
 
 # Internal Relative Urls
 FORCE_SCRIPT_NAME = PROXY_URL_PREFIX + '/'
@@ -74,7 +82,6 @@ WEASYPRINT_CSS_LOOPBACK = 'http://edivorce-django:8080'
 WEASYPRINT_CSS_LOOPBACK += PROXY_URL_PREFIX
 
 # External URLs
-PROXY_BASE_URL = 'https://justice.gov.bc.ca'
 LOGOUT_URL_TEMPLATE = 'https://logon.gov.bc.ca/clp-cgi/logoff.cgi?returl=%s%s&retnow=1'
 LOGOUT_URL = LOGOUT_URL_TEMPLATE % (PROXY_BASE_URL, PROXY_URL_PREFIX)
 
@@ -84,6 +91,10 @@ BASICAUTH_USERNAME = os.getenv('BASICAUTH_USERNAME', '')
 BASICAUTH_PASSWORD = os.getenv('BASICAUTH_PASSWORD', '')
 
 # Lock down the session cookie settings
-SESSION_COOKIE_SECURE=True
-SESSION_COOKIE_PATH = PROXY_URL_PREFIX
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+if DEPLOYMENT_TYPE != 'minishift':
+    SESSION_COOKIE_PATH = PROXY_URL_PREFIX
+    SESSION_COOKIE_SECURE=True
+    CSRF_COOKIE_SECURE=True
+

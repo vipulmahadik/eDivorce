@@ -235,6 +235,22 @@ def acknowledgements(request):
     """
     return render(request, 'acknowledgements.html', context={'active_page': 'acknowledgements'})
 
+def contact(request):
+    """
+    Contact Us page
+    """
+    return render(request, 'contact-us.html', context={'active_page': 'contact'})
+
+@bceid_required
+def intercept_page(request):
+    """
+    On intercept, show the Orders page to get the requested orders before the
+    user sees the nav on the left, so that it's already customized to their
+    input.
+    """
+    template = 'question/%02d_%s.html' % (template_step_order['orders'], 'orders')
+    responses_dict = get_responses_from_db(request.user)
+    responses_dict['intercepted'] = True
 
 def __get_bceid_user(request):
     user, created = BceidUser.objects.get_or_create(user_guid=request.bceid_user.guid)
