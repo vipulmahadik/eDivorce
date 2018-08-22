@@ -1,5 +1,6 @@
 from edivorce.apps.core.models import UserResponse, Question
 from edivorce.apps.core.utils.question_step_mapping import question_step_mapping
+from collections import OrderedDict
 
 
 def get_responses_from_db(bceid_user):
@@ -65,7 +66,7 @@ def get_responses_from_db_grouped_by_steps(bceid_user, hide_failed_conditionals=
 
 
 def get_responses_from_session(request):
-    return sorted(request.session.items())
+    return OrderedDict(sorted(request.session.items()))
 
 
 def get_responses_from_session_grouped_by_steps(request):

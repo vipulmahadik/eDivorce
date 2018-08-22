@@ -1,5 +1,7 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.conf import settings
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from edivorce.apps.core.models import Question
 

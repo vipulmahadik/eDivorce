@@ -3,6 +3,7 @@ import sys
 from django import template
 
 from .format_utils import date_formatter
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -15,7 +16,7 @@ def effective_date(context, *args, **kwargs):
     if context['responses']['divorce_take_effect_on'] == 'specific date':
         date = context['responses']['divorce_take_effect_on_specific_date']
         if date == '':
-            effective = '<span class="form-entry not-complete"></span>'
+            effective = format_html('<span class="form-entry not-complete"></span>')
         else:
             effective = date_formatter(date)
     return effective
