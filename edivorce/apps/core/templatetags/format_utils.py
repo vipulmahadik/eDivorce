@@ -1,6 +1,8 @@
+import re
+
 from django import template
 from datetime import datetime
-import re
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -30,4 +32,5 @@ def required(field, size=None, trail=''):
     if field.strip():
         return '%s%s' % (field, trail)
     style = ('min-width: %spx' % size) if size is not None else ''
-    return '<span class="form-entry not-complete" style="%s"></span>' % style
+    return format_html('<span class="form-entry not-complete" style="{}"></span>', style)
+

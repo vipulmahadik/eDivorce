@@ -1,6 +1,8 @@
 from django import template
 import json
 
+from django.utils.html import format_html, format_html_join
+
 register = template.Library()
 
 
@@ -20,27 +22,26 @@ def reformat_value(source, question_key):
         if question_key == 'spouse_support_details' or question_key == 'other_orders_detail'\
                 or question_key == 'provide_certificate_later_reason' or question_key == 'not_provide_certificate_reason':
             text_list = source.split('\n')
-            tag = ["<ul>"]
-            for value in text_list:
-                if value and not value.isspace():
-                    tag.append('<li>' + value + '</li>')
-            tag.append('</ul>')
-            return ''.join(tag)
+            return process_list(text_list, question_key)
         return source
 
 
 def process_list(lst, question_key):
-    tag = ["<ul>"]
     if question_key.startswith('other_name_'):
-        for alias_type, value in lst:
-            if value:
-                tag.append('<li>' + alias_type + ' ' + value + '</li>')
+        list_items = format_html_join(
+                    '\n',
+                    '<li>{} {}</li>',
+                    ((alias_type, value) for alias_type, value in lst if value))
     else:
-        for value in lst:
-            if value and not value.isspace():
-                tag.append('<li>' + value + '</li>')
-    tag.append('</ul>')
-    return ''.join(tag)
+        list_items = format_html_join(
+                    '\n',
+                    '<li>{0}</li>',
+                    ((value, '') for value in lst if value and not value.isspace()))
+    tag = format_html(
+        '<ul>{}</ul>',
+        list_items)
+
+    return tag
 
 
 @register.simple_tag
@@ -49,10 +50,7 @@ def combine_address(source):
         Reformat address to combine them into one cell with multiple line
         Also show/hide optional questions
     """
-    tags = []
-    first_column = '<tr><td width="75%" style="padding-right: 5%">'
-    second_column = '<td width="25%">'
-    end_tag = '</td></tr>'
+    tags = ''
 
     address_you = ""
     fax_you = ""
@@ -69,7 +67,7 @@ def combine_address(source):
             if "email" not in q_id and "fax" not in q_id:
                 if q_id == "address_to_send_official_document_country_you":
                     continue
-                address_you += item["value"] + '<br />'
+                address_you = format_html('{}{}<br />', address_you, item["value"])
             elif "fax" in q_id:
                 fax_you = item["value"]
             elif "email" in q_id:
@@ -78,7 +76,7 @@ def combine_address(source):
             if "email" not in q_id and "fax" not in q_id:
                 if q_id == "address_to_send_official_document_country_spouse":
                     continue
-                address_spouse += item["value"] + '<br />'
+                address_spouse = format_html('{}{}<br />', address_spouse, item["value"])
             elif "fax" in q_id:
                 fax_spouse = item["value"]
             elif "email" in q_id:
@@ -92,27 +90,21 @@ def combine_address(source):
             effective_date = item['value']
 
     if address_you != "":
-        tags.append(first_column + "What is the best address to send you official court documents?</td>"
-                    + second_column + address_you + end_tag)
+        tags = format_table_data(tags, "What is the best address to send you official court documents?", address_you)
     if fax_you != "":
-        tags.append(first_column + "Fax</td>" + second_column + fax_you + end_tag)
-
+        tags = format_table_data(tags, "Fax", fax_you)
     if email_you != "":
-        tags.append(first_column + "Email</td>" + second_column + email_you + end_tag)
-
+        tags = format_table_data(tags, "Email", email_you)
     if address_spouse != "":
-        tags.append(first_column + "What is the best address to send your spouse official court documents?</td>"
-                    + second_column + address_spouse + end_tag)
+        tags = format_table_data(tags, "What is the best address to send your spouse official court documents?", address_spouse)
     if fax_spouse != "":
-        tags.append(first_column + "Fax</td>" + second_column + fax_spouse + end_tag)
-
+        tags = format_table_data(tags, "Fax", fax_spouse)
     if email_spouse != "":
-        tags.append(first_column + "Email</td>" + second_column + email_spouse + end_tag)
-
+        tags = format_table_data(tags, "Email", email_spouse)
     if effective_date != "":
-        tags.append(first_column + "Divorce is to take effect on </td>" + second_column + effective_date + end_tag)
+        tags = format_table_data(tags, "Divorce is to take effect on", effective_date)
 
-    return ''.join(tags)
+    return tags
 
 
 @register.simple_tag(takes_context=True)
@@ -122,10 +114,7 @@ def marriage_tag(context, source):
         Also show/hide optional questions
     """
     show_all = False
-    tags = []
-    first_column = '<tr><td width="75%" style="padding-right: 5%">'
-    second_column = '</td><td width="25%">'
-    end_tag = '</td></tr>'
+    tags = ''
 
     marriage_location = ""
     married_date = ""
@@ -159,7 +148,7 @@ def marriage_tag(context, source):
         elif q_id.startswith('where_were_you_married'):
             if value == 'Other':
                 continue
-            marriage_location += value + '<br />'
+            marriage_location = format_html('{}{}<br />', marriage_location, value)
         elif q_id == 'marital_status_before_you':
             marital_status_you_q = q_name
             marital_status_you = value
@@ -168,17 +157,17 @@ def marriage_tag(context, source):
             marital_status_spouse = value
 
     if show_all and married_date != "":
-        tags.append(first_column + married_date_q + second_column + married_date + end_tag)
+        tags = format_table_data(tags, married_date_q, married_date)
     if common_law_date != "":
-        tags.append(first_column + common_law_date_q + second_column + common_law_date + end_tag)
+        tags = format_table_data(tags, common_law_date_q, common_law_date)
     if show_all and marriage_location != "":
-        tags.append(first_column + "Where were you married" + second_column + marriage_location + end_tag)
+        tags = format_table_data(tags, "Where were you married", marriage_location)
     if marital_status_you != "":
-        tags.append(first_column + marital_status_you_q + second_column + marital_status_you + end_tag)
+        tags = format_table_data(tags, marital_status_you_q, marital_status_you)
     if marital_status_spouse != "":
-        tags.append(first_column + marital_status_spouse_q + second_column + marital_status_spouse + end_tag)
+        tags = format_table_data(tags, marital_status_spouse_q, marital_status_spouse)
 
-    return ''.join(tags)
+    return tags
 
 
 @register.simple_tag
@@ -187,10 +176,7 @@ def property_tag(source):
         Reformat your_property and debt step
         Also show/hide optional questions
     """
-    tags = []
-    first_column = '<tr><td width="75%" style="padding-right: 5%">'
-    second_column = '</td><td width="25%">'
-    end_tag = '</td></tr>'
+    tags = ''
 
     division = division_detail = other_detail = None
 
@@ -205,13 +191,13 @@ def property_tag(source):
             other_detail = item
 
     if division:
-        tags.append(first_column + division['question__name'] + second_column + division['value'] + end_tag)
+        tags = format_table_data(tags, division['question__name'], division['value'])
     if division and division['value'] == "Unequal division" and division_detail:
-        tags.append(first_column + division_detail['question__name'] + second_column + process_list(division_detail['value'].split('\n'), division_detail['question_id']) + end_tag)
+        tags = format_table_data(tags, division_detail['question__name'], process_list(division_detail['value'].split('\n'), division_detail['question_id']))
     if other_detail and other_detail['value'].strip():
-        tags.append(first_column + other_detail['question__name'] + second_column + process_list(other_detail['value'].split('\n'), other_detail['question_id']) + end_tag)
+        tags = format_table_data(tags, other_detail['question__name'], process_list(other_detail['value'].split('\n'), other_detail['question_id']))
 
-    return ''.join(tags)
+    return tags
 
 
 @register.simple_tag
@@ -220,10 +206,7 @@ def prequal_tag(source):
         Reformat prequalification step
         Also show/hide optional questions
     """
-    tags = []
-    first_column = '<tr><td width="75%" style="padding-right: 5%">'
-    second_column = '</td><td width="25%">'
-    end_tag = '</td></tr>'
+    tags = ''
 
     marriage_status = lived_in_bc = live_at_least_year = separation_date = try_reconcile = reconciliation_period = None
     children_of_marriage = any_under_19 = financial_support = certificate = provide_later = None
@@ -265,37 +248,37 @@ def prequal_tag(source):
                 divorce_reason['value'] = 'Lived apart for one year'
 
     if marriage_status:
-        tags.append(first_column + marriage_status['question__name'] + second_column + marriage_status['value'] + end_tag)
+        tags = format_table_data(tags, marriage_status['question__name'], marriage_status['value'])
     if lived_in_bc:
-        tags.append(first_column + lived_in_bc['question__name'] + second_column + lived_in_bc['value'] + end_tag)
+        tags = format_table_data(tags, lived_in_bc['question__name'], lived_in_bc['value'])
     if live_at_least_year:
-        tags.append(first_column + live_at_least_year['question__name'] + second_column + live_at_least_year['value'] + end_tag)
+        tags = format_table_data(tags, live_at_least_year['question__name'], live_at_least_year['value'])
     if separation_date:
-        tags.append(first_column + separation_date['question__name'] + second_column + separation_date['value'] + end_tag)
+        tags = format_table_data(tags, separation_date['question__name'], separation_date['value'])
     if try_reconcile:
-        tags.append(first_column + try_reconcile['question__name'] + second_column + try_reconcile['value'] + end_tag)
+        tags = format_table_data(tags, try_reconcile['question__name'], try_reconcile['value'])
     if try_reconcile and try_reconcile['value'] == 'YES' and reconciliation_period:
-        tags.append(first_column + reconciliation_period['question__name'] + second_column + reconciliation_period_reformat(reconciliation_period['value']) + end_tag)
+        tags = format_table_data(tags, reconciliation_period['question__name'], reconciliation_period_reformat(reconciliation_period['value']))
     if children_of_marriage:
-        tags.append(first_column + children_of_marriage['question__name'] + second_column + children_of_marriage['value'] + end_tag)
+        tags = format_table_data(tags, children_of_marriage['question__name'], children_of_marriage['value'])
     if children_of_marriage and children_of_marriage['value'] == 'YES' and any_under_19:
-        tags.append(first_column + any_under_19['question__name'] + second_column + any_under_19['value'] + end_tag)
+        tags = format_table_data(tags, any_under_19['question__name'], any_under_19['value'])
     if children_of_marriage and children_of_marriage['value'] == 'YES' and any_under_19['value'] == 'NO' and financial_support:
-        tags.append(first_column + financial_support['question__name'] + second_column + json.loads(financial_support['value'])[0] + end_tag)
+        tags = format_table_data(tags, financial_support['question__name'], '<br>'.join(json.loads(financial_support['value'])))
     if certificate:
-        tags.append(first_column + certificate['question__name'] + second_column + certificate['value'] + end_tag)
+        tags = format_table_data(tags, certificate['question__name'], certificate['value'])
     if certificate and certificate['value'] == 'NO' and provide_later:
-        tags.append(first_column + provide_later['question__name'] + second_column + provide_later['value'] + end_tag)
+        tags = format_table_data(tags, provide_later['question__name'], provide_later['value'])
     if certificate and provide_later and certificate['value'] == 'NO' and provide_later['value'] == 'YES' and provide_later_reason:
-        tags.append(first_column + provide_later_reason['question__name'] + second_column + process_list(provide_later_reason['value'].split('\n'), provide_later_reason['question_id']) + end_tag)
+        tags = format_table_data(tags, provide_later_reason['question__name'], process_list(provide_later_reason['value'].split('\n'), provide_later_reason['question_id']))
     if certificate and provide_later and certificate['value'] == 'NO' and provide_later['value'] == 'NO' and not_provide_later_reason:
-        tags.append(first_column + not_provide_later_reason['question__name'] + second_column + process_list(not_provide_later_reason['value'].split('\n'), not_provide_later_reason['question_id']) + end_tag)
+        tags = format_table_data(tags, not_provide_later_reason['question__name'], process_list(not_provide_later_reason['value'].split('\n'), not_provide_later_reason['question_id']))
     if marriage_status and marriage_status['value'] == 'Living together in a marriage like relationship' and in_english:
-        tags.append(first_column + in_english['question__name'] + second_column + in_english['value'] + end_tag)
+        tags = format_table_data(tags, in_english['question__name'], in_english['value'])
     if divorce_reason:
-        tags.append(first_column + divorce_reason['question__name'] + second_column + divorce_reason['value'] + end_tag)
+        tags = format_table_data(tags, divorce_reason['question__name'], divorce_reason['value'])
 
-    return ''.join(tags)
+    return tags
 
 
 @register.simple_tag
@@ -304,10 +287,7 @@ def personal_info_tag(source):
         Reformat your information and your spouse step
         Also show/hide optional questions
     """
-    tags = []
-    first_column = '<tr><td width="75%" style="padding-right: 5%">'
-    second_column = '</td><td width="25%">'
-    end_tag = '</td></tr>'
+    tags = ''
 
     name = other_name = other_name_list = last_name_born = last_name_before = None
     birthday = occupation = lived_bc = moved_bc = None
@@ -335,25 +315,33 @@ def personal_info_tag(source):
             moved_bc = item
 
     if name:
-        tags.append(first_column + name['question__name'] + second_column + name['value'] + end_tag)
+        tags = format_table_data(tags, name['question__name'], name['value'])
     if other_name:
-        tags.append(first_column + other_name['question__name'] + second_column + other_name['value'] + end_tag)
+        tags = format_table_data(tags, other_name['question__name'], other_name['value'])
     if other_name and other_name['value'] == 'YES' and other_name_list:
-        tags.append(first_column + other_name_list['question__name'] + second_column + process_list(json.loads(other_name_list['value']), other_name_list['question_id']) + end_tag)
+        tags = format_table_data(tags, other_name_list['question__name'], process_list(json.loads(other_name_list['value']), other_name_list['question_id']))
     if last_name_born:
-        tags.append(first_column + last_name_born['question__name'] + second_column + last_name_born['value'] + end_tag)
+        tags = format_table_data(tags, last_name_born['question__name'], last_name_born['value'])
     if last_name_before:
-        tags.append(first_column + last_name_before['question__name'] + second_column + last_name_before['value'] + end_tag)
+        tags = format_table_data(tags, last_name_before['question__name'], last_name_before['value'])
     if birthday:
-        tags.append(first_column + birthday['question__name'] + second_column + birthday['value'] + end_tag)
+        tags = format_table_data(tags, birthday['question__name'], birthday['value'])
     if occupation:
-        tags.append(first_column + occupation['question__name'] + second_column + occupation['value'] + end_tag)
+        tags = format_table_data(tags, occupation['question__name'], occupation['value'])
     if lived_bc and moved_bc and lived_bc['value'] == "Moved to B.C. on":
-        tags.append(first_column + lived_bc['question__name'] + second_column + lived_bc['value'] + ' ' + moved_bc['value'] + end_tag)
+        tags = format_table_data(tags, lived_bc['question__name'], lived_bc['value'] + ' ' + moved_bc['value'])
     if lived_bc and lived_bc['value'] != "Moved to B.C. on" and lived_bc:
-        tags.append(first_column + lived_bc['question__name'] + second_column + lived_bc['value'] + end_tag)
+        tags = format_table_data(tags, lived_bc['question__name'], lived_bc['value'])
 
-    return ''.join(tags)
+    return tags
+
+
+def format_table_data(tags, question, response):
+    return format_html(
+        '{}<tr><td width="75%" style="padding-right: 5%">{}</td><td width="25%">{}</td></tr>',
+        tags,
+        question,
+        response)
 
 
 def reconciliation_period_reformat(lst):
@@ -366,5 +354,5 @@ def reconciliation_period_reformat(lst):
         lst = []
     period = ""
     for f_date, t_date in lst:
-        period += "From " + f_date + " to " + t_date + "<br />"
+        period = format_html('{}From {} to {}<br />', period, f_date, t_date)
     return period
