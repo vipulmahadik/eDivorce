@@ -263,7 +263,7 @@ def prequal_tag(source):
         tags = format_table_data(tags, children_of_marriage['question__name'], children_of_marriage['value'])
     if children_of_marriage and children_of_marriage['value'] == 'YES' and any_under_19:
         tags = format_table_data(tags, any_under_19['question__name'], any_under_19['value'])
-    if children_of_marriage and children_of_marriage['value'] == 'YES' and any_under_19['value'] == 'NO' and financial_support:
+    if children_of_marriage and children_of_marriage['value'] == 'YES' and any_under_19 and any_under_19['value'] == 'NO' and financial_support:
         tags = format_table_data(tags, financial_support['question__name'], '<br>'.join(json.loads(financial_support['value'])))
     if certificate:
         tags = format_table_data(tags, certificate['question__name'], certificate['value'])
