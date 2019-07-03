@@ -1401,8 +1401,16 @@ textarea {
             -ms-flex-order: 4;
             order: 4;
             -webkit-box-flex: 0;
-            -ms-flex: 0 0 306px;
-            flex: 0 0 306px;
+            -ms-flex: 0 0 390px;
+			flex: 0 0 390px;
+			
+			iframe {
+				height: calc(100vh - 290px);
+				min-height: 500px;
+				margin-top: 15px;
+				width: 100%;
+				box-shadow: 0 10px 15px -10px black;
+			}
         }
     }
 
@@ -1979,8 +1987,8 @@ span.hard-stop {
 	@media (min-width: 992px) {
 		-webkit-transition: 0.2s ease-out all;
 		transition: 0.2s ease-out all;
-		-webkit-transform: translateX(306px);
-		transform: translateX(306px);
+		-webkit-transform: translateX(390px);
+		transform: translateX(390px);
 	}
 }
 
@@ -1991,7 +1999,7 @@ span.hard-stop {
 	@media (min-width: 992px) {
 		-webkit-transition: 0.2s ease-out all;
 		transition: 0.2s ease-out all;
-		margin-right: -306px;
+		margin-right: -390px;
 	}
 }
 

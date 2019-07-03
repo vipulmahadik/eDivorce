@@ -12,6 +12,36 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <link type="text/css" rel="stylesheet" href="https://tars.passage.ai/tars.css">
+
+        <script>
+        const url = window.location.pathname;
+        // const shouldReset = (performance.navigation.type === 1 ? '' : '&resetHistory');
+        // window.paiSettings = {
+        //   botId: '1028834855', // Your bot id. Required. 3070164780 is the test bot.
+        //   // userId: 'loaderTest', // If a user is logged in, set the user id.
+        //   iframeEmbedTarget: 'paiChatIframeEmbedTarget', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
+        //   iframeEmbedUrlParameters: '&debuggingmobilelayout20170918&mobilewebviewlayout&enableConsoleLogs' + shouldReset, // Append these to the src URL of the iframe.
+        //   messageMetadata: {
+        //       currentUrl: url,
+        //   },
+
+        // sendMessageToChat: {
+        //     message: 'Auto zurücksetzen auf ',
+        //     show: true
+        // },
+        // verticalQuickReplies: true,
+        //   // Enable Google Places Autocomplete by providing your API key here.
+        //   googlePlacesApiKey: 'AIzaSyBT0iLh95U4jfB926IQ7Z2_gLBai6MvSwA',
+
+        //   // Adds domain information to Google Analytics
+        //   // googleAnalyticsDomain: 'sampleDomain'
+
+        //   // enableSpeechRecognition: 'en-US'
+        // };
+        
+
+    </script>
         {% compress css %}
         <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.min.css" %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-datepicker3.min.css" %}">
@@ -27,7 +57,68 @@
         <script>
             window.sm_base_url = '{{ proxy_root_path }}';
         </script>
+    <style>
+        .inbuilt-info {
+            position: relative;
+        }
+        .language-selector {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: calc(100vh - 235px);
+            width: 100%;
+            padding: 30px;
+            transition: all 0.3s;
+            overflow: hidden;
+            background: white;
+        }
+        .language-selector-button {
+            width: 100%;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            background: none;
+            cursor: pointer;
+            padding: 25px 80px;
+            display: inline-block;
+            margin: 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            outline: none;
+            position: relative;
+            -webkit-transition: all 0.3s;
+            -moz-transition: all 0.3s;
+            transition: all 0.3s;
+            border-radius: 10px;
+            border: 3px solid #0e83cd;
+        }
+        .language-selector-button:hover {
+            color: white;
+            background: #0e83cd;
+        }
 
+        .language-button {
+            opacity: 1;
+            width: 100%;
+            height: 40px;
+            background: white;
+            outline: none;
+            border: unset;
+            transition: all 0.3s;
+            line-height: 14px;
+            border-left: 4px solid #2a5580;
+        }
+
+        .language-button:hover {
+            background: #2a5580;
+            color: white;
+        }
+
+        .language-selector-wrapper {
+            position: relative;
+        }
+    </style>
     </head>
     <body>
         {% include 'partials/gtm_body.html' %}
@@ -117,14 +208,29 @@
             </div>
 
             {% block sidebar %}
-            <div class="col-flex more_information-column">
+            <div id="paiChatIframeEmbedTarget" class="col-flex more_information-column">
                 <a href="#" class="more_information-close"><i class="fa fa-times" aria-hidden="true"></i></a>
-                <h2>More information</h2>
-                {% block sidebarText %}
-                {% endblock %}
+                <div class="inbuilt-info">
+                    <h2>More Information</h2>
+                </div>
+                <div class="language-selector-wrapper">                    
+                    <div class="language-selector">
+                        <div class="language-content">
+                            <h4>Select Language</h4>
+                            <div class="language-selector-button-wrapper">
+                                <button class="language-selector-button" onclick="selectLanguage('en')">English</button>
+                            </div>
+                            <div class="language-selector-button-wrapper">
+                                <button class="language-selector-button" onclick="selectLanguage('fr')">French</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="language-button" onclick="selectLanguage()">Change Language</button>
+                <iframe id="iframe-english" frameborder="0"></iframe>
+                <iframe id="iframe-french" frameborder="0"></iframe>
             </div>
             {% endblock %}
-
         </div>
 
         <footer class="footer">
@@ -216,5 +322,42 @@
         <script type="text/javascript" src="{% static 'js/ajax.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
         {% endcompress %}
+
+        <script src="http://localhost:9090/tars.js"></script>
+    <!-- <script>
+        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars.passage.ai/loader.min.js?botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
+    </script> -->
+
+        <script>
+            let hidden = false
+            function selectLanguage(lang) {
+                if (lang === 'en') {
+                    $('#iframe-french').hide(0, function() {
+                        if ($('#iframe-english').attr('src') === '' || $('#iframe-english').attr('src') === undefined) {
+                            $('#iframe-english').attr('src', "http://localhost:9090/loader-bc-english.html?base="+encodeURIComponent(url));
+                        }
+                        $('#iframe-english').show()
+                    })
+                } else if (lang === 'fr') {
+                    $('#iframe-english').hide(0, function () {
+                        if ($('#iframe-french').attr('src') === '' || $('#iframe-french').attr('src') === undefined) {
+                            $('#iframe-french').attr('src', "http://localhost:9090/loader-bc-french.html?base="+encodeURIComponent(url));
+                        }
+                        $('#iframe-french').show()
+                    })
+                }
+                if (hidden) {
+                    $('.language-selector').show()
+                } else {
+                    $('.language-selector').hide()
+                }
+                hidden = !hidden
+            }
+
+            function main() {
+                $('#iframe-french').hide();
+            };
+            main()
+        </script>
     </body>
 </html>
