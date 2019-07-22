@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 {% load sass_tags %}
 {% load compress %}
 
@@ -118,6 +118,15 @@
         .language-selector-wrapper {
             position: relative;
         }
+
+        #paiChatIframeEmbedTarget {
+            position: relative;
+            min-height: 890px;
+        }
+        #floating-side-menu{
+            position: fixed;
+            width: 350px;
+        }
     </style>
     </head>
     <body>
@@ -209,26 +218,28 @@
 
             {% block sidebar %}
             <div id="paiChatIframeEmbedTarget" class="col-flex more_information-column">
-                <a href="#" class="more_information-close"><i class="fa fa-times" aria-hidden="true"></i></a>
-                <div class="inbuilt-info">
-                    <h2>More Information</h2>
-                </div>
-                <div class="language-selector-wrapper">                    
-                    <div class="language-selector">
-                        <div class="language-content">
-                            <h4>Select Language</h4>
-                            <div class="language-selector-button-wrapper">
-                                <button class="language-selector-button" onclick="selectLanguage('en')">English</button>
-                            </div>
-                            <div class="language-selector-button-wrapper">
-                                <button class="language-selector-button" onclick="selectLanguage('fr')">French</button>
+                <div id="floating-side-menu">
+                    <a href="#" class="more_information-close"><i class="fa fa-times" aria-hidden="true"></i></a>
+                    <div class="inbuilt-info">
+                        <h2>More Information</h2>
+                    </div>
+                    <div class="language-selector-wrapper">                    
+                        <div class="language-selector">
+                            <div class="language-content">
+                                <h4>Select Language</h4>
+                                <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button" onclick="selectLanguage('en')">English</button>
+                                </div>
+                                <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button" onclick="selectLanguage('fr')">French</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <button class="language-button" onclick="selectLanguage()">Change Language</button>
+                    <iframe id="iframe-english" frameborder="0"></iframe>
+                    <div id="iframe-french" frameborder="0"></div>
                 </div>
-                <button class="language-button" onclick="selectLanguage()">Change Language</button>
-                <iframe id="iframe-english" frameborder="0"></iframe>
-                <iframe id="iframe-french" frameborder="0"></iframe>
             </div>
             {% endblock %}
         </div>
@@ -323,41 +334,124 @@
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
         {% endcompress %}
 
-        <script src="https://tars-int.passage.ai/tars.js"></script>
+    <script src="https://tars-int.passage.ai/tars.js"></script>
     <!-- <script>
         (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars.passage.ai/loader.min.js?botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
     </script> -->
 
-        <script>
-            let hidden = false
-            function selectLanguage(lang) {
-                if (lang === 'en') {
-                    $('#iframe-french').hide(0, function() {
-                        if ($('#iframe-english').attr('src') === '' || $('#iframe-english').attr('src') === undefined) {
-                            $('#iframe-english').attr('src', "https://tars-int.passage.ai/loader-bc-english.html?base="+encodeURIComponent(url));
-                        }
-                        $('#iframe-english').show()
-                    })
-                } else if (lang === 'fr') {
-                    $('#iframe-english').hide(0, function () {
-                        if ($('#iframe-french').attr('src') === '' || $('#iframe-french').attr('src') === undefined) {
-                            $('#iframe-french').attr('src', "https://tars-int.passage.ai/loader-bc-french.html?base="+encodeURIComponent(url));
-                        }
-                        $('#iframe-french').show()
-                    })
-                }
-                if (hidden) {
-                    $('.language-selector').show()
-                } else {
-                    $('.language-selector').hide()
-                }
-                hidden = !hidden
+    <script>
+        let hidden = false
+        function selectLanguage(lang) {
+            if (lang === 'en') {
+                $('#iframe-french').hide(0, function () {
+                    if ($('#iframe-english').attr('src') === '' || $('#iframe-english').attr('src') === undefined) {
+                        $('#iframe-english').attr('src', "https://tars-int.passage.ai/loader-bc-english.html?base=" + encodeURIComponent(url));
+                    }
+                    $('#iframe-english').show()
+                })
+            } else if (lang === 'fr') {
+                $('#iframe-english').hide(0, function () {
+                    window.paiSettings = {
+                        botId: '13165056930037235770', // Your bot id. Required.
+                        iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
+                        iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
+                        userMessageColor: '#00a09f', // Change the background color of the user message bubble.
+                        verticalQuickReplies: true,
+                        brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
+                        messageMetadata: {
+                            parent: url
+                        },
+                    };
+                    function l2() {
+                        var s = document.createElement('script');
+                        s.type = 'text/javascript';
+                        s.async = true;
+                        s.src = 'https://tars-int.passage.ai/loader.min.js?botId=' + window.paiSettings.botId;
+                        var x = document.getElementsByTagName('script')[0];
+                        x.parentNode.insertBefore(s, x);
+                    }
+                    if ($('#iframe-french').html() == "") {
+                        l2()
+                    }
+                    $('#iframe-french').show()
+                })
             }
+            localStorage.setItem("lang", lang);
+            if (hidden) {
+                $('.language-selector').show()
+            } else {
+                $('.language-selector').hide()
+            }
+            hidden = !hidden
+        }
 
-            function main() {
-                $('#iframe-french').hide();
+        function main() {
+            function highlightBox(identifier) {
+                console.log(identifier)
+                const questionNumber = identifier.charAt(identifier.length - 1) - 1
+                $('.question-well').removeClass('hasFocus')
+                $('.question-well').eq(questionNumber).addClass('hasFocus')
+                $('html,body').animate({
+                    scrollTop: $('.question-well').eq(questionNumber).offset().top-200
+                }, 1000);
+            }
+            function highlightPrevious(parent, answer) {
+                //answer = answer.toUpperCase()
+                if (parent && answer) {
+                    const questionNumber = parent.charAt(parent.length - 1) - 1
+                    console.log("Need to select: " + questionNumber + " and answer: " + answer)
+                    console.log($('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`))
+                    $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click')
+                }
+            }
+            function receiveMessage(msg) {
+                if (typeof msg.data == 'object') {
+                    const modifiedData = (msg.data);
+                    console.log(modifiedData)
+                    const { parent } = modifiedData;
+                    const { answer } = modifiedData;
+                    highlightPrevious(parent, answer)
+                    highlightBox(modifiedData.question);
+                }
             };
-            main()
-        </script>
-    </body>
+            window.addEventListener('message', receiveMessage, false);
+
+            var span = $('#floating-side-menu'),
+                div = $('#paiChatIframeEmbedTarget'),
+                win = $(window);
+            $(document).scroll(compute).scroll();
+            $(window).resize(compute).resize();
+            
+            function compute() {
+                var spanHeight = span.outerHeight(),
+                    divHeight = div.height(),
+                    spanOffset = span.offset().top + spanHeight,
+                    divOffset = div.offset().top + divHeight;
+                //console.log(div.offset().top - $(document).scrollTop())
+                //console.log(span.offset().top - $(document).scrollTop())
+                if ((divOffset - $(document).scrollTop()+90) < window.innerHeight) {
+                    span.css("position", "absolute")
+                    span.css("top", "unset")
+                    span.css("bottom", "30px")
+                    // console.log("Voila")
+                }
+                //} else if (div.offset().top + 45 > span.offset().top) {
+                //  span.css("position", "absolute")
+                    //console.log("Voil 2 a")
+                else {
+                    // console.log("What")
+                    span.css("position", "fixed")
+                }
+            }
+        };
+        $( document ).ready(function() {
+            if (localStorage.getItem("lang")) {
+                console.log(localStorage.getItem("lang"))
+                selectLanguage(localStorage.getItem("lang"))
+            }
+        });
+        main();
+    </script>
+</body>
+
 </html>
