@@ -228,7 +228,7 @@
                             <div class="language-content">
                                 <h4>Select Language</h4>
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('en')">English</button>
+                                    <button class="language-selector-button" onclick="selectLanguage('en')">Chinese</button>
                                 </div>
                                 <div class="language-selector-button-wrapper">
                                     <button class="language-selector-button" onclick="selectLanguage('fr')">French</button>
@@ -345,7 +345,7 @@
             if (lang === 'en') {
                 $('#iframe-french').hide(0, function () {
                     if ($('#iframe-english').attr('src') === '' || $('#iframe-english').attr('src') === undefined) {
-                        $('#iframe-english').attr('src', "https://tars-int.passage.ai/loader-bc-english.html?base=" + encodeURIComponent(url));
+                        $('#iframe-english').attr('src', "http://localhost:9090/loader-bc-english.html?base=" + encodeURIComponent(url));
                     }
                     $('#iframe-english').show()
                 })
@@ -366,7 +366,7 @@
                         var s = document.createElement('script');
                         s.type = 'text/javascript';
                         s.async = true;
-                        s.src = 'https://tars-int.passage.ai/loader.min.js?botId=' + window.paiSettings.botId;
+                        s.src = 'http://localhost:9090/loader.min.js?botId=' + window.paiSettings.botId;
                         var x = document.getElementsByTagName('script')[0];
                         x.parentNode.insertBefore(s, x);
                     }
@@ -395,13 +395,17 @@
                     scrollTop: $('.question-well').eq(questionNumber).offset().top-200
                 }, 1000);
             }
-            function highlightPrevious(parent, answer) {
+            function highlightPrevious(parent, answer, type) {
                 //answer = answer.toUpperCase()
                 if (parent && answer) {
                     const questionNumber = parent.charAt(parent.length - 1) - 1
                     console.log("Need to select: " + questionNumber + " and answer: " + answer)
                     console.log($('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`))
-                    $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click')
+                    if (type === 'text') {
+                        $('.question-well').eq(questionNumber).find(`input:text`).val(`${answer}`)
+                    } else {
+                        $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click')
+                    }
                 }
             }
             function receiveMessage(msg) {
@@ -410,7 +414,8 @@
                     console.log(modifiedData)
                     const { parent } = modifiedData;
                     const { answer } = modifiedData;
-                    highlightPrevious(parent, answer)
+                    const { type } = modifiedData;
+                    highlightPrevious(parent, answer, type);
                     highlightBox(modifiedData.question);
                 }
             };
