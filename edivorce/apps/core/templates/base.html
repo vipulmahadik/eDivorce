@@ -388,12 +388,16 @@
         function main() {
             function highlightBox(identifier) {
                 console.log(identifier)
-                const questionNumber = identifier.charAt(identifier.length - 1) - 1
-                $('.question-well').removeClass('hasFocus')
-                $('.question-well').eq(questionNumber).addClass('hasFocus')
-                $('html,body').animate({
-                    scrollTop: $('.question-well').eq(questionNumber).offset().top-200
-                }, 1000);
+                if(identifier !== 'next') {
+                    const questionNumber = identifier.charAt(identifier.length - 1) - 1
+                    $('.question-well').removeClass('hasFocus')
+                    $('.question-well').eq(questionNumber).addClass('hasFocus')
+                    $('html,body').animate({
+                        scrollTop: $('.question-well').eq(questionNumber).offset().top-200
+                    }, 1000);
+                } else {
+                    $('.question-well').removeClass('hasFocus')
+                }
             }
             function highlightPrevious(parent, answer, type) {
                 //answer = answer.toUpperCase()
