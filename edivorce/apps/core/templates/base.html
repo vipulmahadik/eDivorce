@@ -334,7 +334,7 @@
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
         {% endcompress %}
 
-    <script src="https://tars-int.passage.ai/tars.js"></script>
+    <script src="https://tars-stg.passage.ai/tars.js"></script>
     <!-- <script>
         (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars.passage.ai/loader.min.js?botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
     </script> -->
@@ -352,7 +352,7 @@
             } else if (lang === 'fr') {
                 $('#iframe-english').hide(0, function () {
                     window.paiSettings = {
-                        botId: '13165056930037235770', // Your bot id. Required.
+                        botId: '1028834855', // Your bot id. Required.
                         iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
                         iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
                         userMessageColor: '#00a09f', // Change the background color of the user message bubble.
@@ -366,7 +366,7 @@
                         var s = document.createElement('script');
                         s.type = 'text/javascript';
                         s.async = true;
-                        s.src = 'https://tars-int.passage.ai/loader.min.js?botId=' + window.paiSettings.botId;
+                        s.src = 'https://tars-stg.passage.ai/loader.min.js?botId=' + window.paiSettings.botId;
                         var x = document.getElementsByTagName('script')[0];
                         x.parentNode.insertBefore(s, x);
                     }
@@ -387,7 +387,9 @@
 
         function main() {
             function highlightBox(identifier) {
-                console.log(identifier)
+                if (!identifier) {
+                    return
+                }
                 if(identifier !== 'next') {
                     const questionNumber = identifier.charAt(identifier.length - 1) - 1
                     $('.question-well').removeClass('hasFocus')
