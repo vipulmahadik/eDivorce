@@ -58,6 +58,9 @@
             window.sm_base_url = '{{ proxy_root_path }}';
         </script>
     <style>
+        .multi-select-button {
+            white-space: normal !important;
+        }
         .inbuilt-info {
             position: relative;
         }
@@ -345,7 +348,7 @@
             if (lang === 'en') {
                 $('#iframe-french').hide(0, function () {
                     if ($('#iframe-english').attr('src') === '' || $('#iframe-english').attr('src') === undefined) {
-                        $('#iframe-english').attr('src', "https://tars-int.passage.ai/loader-bc-english.html?base=" + encodeURIComponent(url));
+                        $('#iframe-english').attr('src', "https://tars-stg.passage.ai/loader-bc-english.html?base=" + encodeURIComponent(url));
                     }
                     $('#iframe-english').show()
                 })
@@ -384,7 +387,23 @@
             }
             hidden = !hidden
         }
-
+        let inputInFocus = '';
+        $('div.question-well').on('click', (e) => {
+            let upcomingInput = $(e.currentTarget).find('input').attr('name');
+            if (upcomingInput !== inputInFocus) {
+            console.log(upcomingInput + " - " + inputInFocus)
+                window.paiSettings.messageMetadata.previousQuestion = inputInFocus;
+                window.paiSettings.messageMetadata.nextQuestion = upcomingInput;
+                inputInFocus = upcomingInput
+                $('#iframe-french').find('iframe')[0].contentWindow.postMessage({
+                    paiSettings: window.paiSettings,
+                    sendMessageToChat: {
+                        message: 'Question changed',
+                        show: true
+                    }
+                }, 'https://tars-stg.passage.ai')
+            }
+        })
         function main() {
             function highlightBox(identifier) {
                 if (!identifier) {
@@ -393,20 +412,20 @@
                 if(identifier !== 'next') {
                     const questionNumber = identifier.charAt(identifier.length - 1) - 1
                     $('.question-well').removeClass('hasFocus')
-                    $('.question-well').eq(questionNumber).addClass('hasFocus')
+                    let $questionWellToBeInFocus = $('.question-well').eq(questionNumber)
+                    $questionWellToBeInFocus.addClass('hasFocus')
+                    inputInFocus = $questionWellToBeInFocus.find('input').attr('name')
                     $('html,body').animate({
-                        scrollTop: $('.question-well').eq(questionNumber).offset().top-200
+                        scrollTop: $questionWellToBeInFocus.offset().top-200
                     }, 1000);
+                    
                 } else {
                     $('.question-well').removeClass('hasFocus')
                 }
             }
-            function highlightPrevious(parent, answer, type) {
-                //answer = answer.toUpperCase()
+            function selectPreviousAnswer(parent, answer, type) {
                 if (parent && answer) {
                     const questionNumber = parent.charAt(parent.length - 1) - 1
-                    //console.log("Need to select: " + questionNumber + " and answer: " + answer + " type: " + type)
-                    //console.log($('.question-well').eq(questionNumber).find(`input[type=${type}]`))
                     if (type) {
                         $('.question-well').eq(questionNumber).find(`input[type=${type}]`).val(`${answer}`)
                         $('.question-well').eq(questionNumber).find(`input[type=${type}]`).trigger('change')
@@ -421,7 +440,7 @@
                     const { parent } = modifiedData;
                     const { answer } = modifiedData;
                     const { type } = modifiedData;
-                    highlightPrevious(parent, answer, type || '');
+                    selectPreviousAnswer(parent, answer, type || '');
                     highlightBox(modifiedData.question);
                 }
             };
