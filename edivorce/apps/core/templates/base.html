@@ -12,7 +12,7 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link type="text/css" rel="stylesheet" href="https://tars.passage.ai/tars.css">
+        <link type="text/css" rel="stylesheet" href="https://tars-stg.passage.ai/tars.css">
 
         <script>
         const url = window.location.pathname;
@@ -226,7 +226,7 @@
                     <div class="inbuilt-info">
                         <h2>More Information</h2>
                     </div>
-                    <div class="language-selector-wrapper">                    
+                    <!--  <div class="language-selector-wrapper">                    
                         <div class="language-selector">
                             <div class="language-content">
                                 <h4>Select Language</h4>
@@ -238,9 +238,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>  -->
                     <button class="language-button" onclick="selectLanguage()">Change Language</button>
-                    <iframe id="iframe-english" frameborder="0"></iframe>
+                    <!--  <iframe id="iframe-english" frameborder="0"></iframe>  -->
                     <div id="iframe-french" frameborder="0"></div>
                 </div>
             </div>
@@ -337,56 +337,22 @@
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
         {% endcompress %}
 
-    <script src="https://tars-stg.passage.ai/tars.js"></script>
-    <!-- <script>
-        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars.passage.ai/loader.min.js?botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
-    </script> -->
-
     <script>
         let hidden = false
         function selectLanguage(lang) {
-            if (lang === 'en') {
-                $('#iframe-french').hide(0, function () {
-                    if ($('#iframe-english').attr('src') === '' || $('#iframe-english').attr('src') === undefined) {
-                        $('#iframe-english').attr('src', "https://tars-stg.passage.ai/loader-bc-english.html?base=" + encodeURIComponent(url));
-                    }
-                    $('#iframe-english').show()
-                })
-            } else if (lang === 'fr') {
-                $('#iframe-english').hide(0, function () {
-                    window.paiSettings = {
-                        botId: '1028834855', // Your bot id. Required.
-                        iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-                        iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
-                        userMessageColor: '#00a09f', // Change the background color of the user message bubble.
-                        verticalQuickReplies: true,
-                        brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
-                        messageMetadata: {
-                            parent: url
-                        },
-                    };
-                    function l2() {
-                        var s = document.createElement('script');
-                        s.type = 'text/javascript';
-                        s.async = true;
-                        s.src = 'https://tars-stg.passage.ai/loader.min.js?botId=' + window.paiSettings.botId;
-                        var x = document.getElementsByTagName('script')[0];
-                        x.parentNode.insertBefore(s, x);
-                    }
-                    if ($('#iframe-french').html() == "") {
-                        l2()
-                    }
-                    $('#iframe-french').show()
-                })
-            }
-            localStorage.setItem("lang", lang);
-            if (hidden) {
-                $('.language-selector').show()
-            } else {
-                $('.language-selector').hide()
-            }
-            hidden = !hidden
+            // window.paiSettings = {
+            //     botId: '1028834855', // Your bot id. Required.
+            //     iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
+            //     iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
+            //     userMessageColor: '#00a09f', // Change the background color of the user message bubble.
+            //     verticalQuickReplies: true,
+            //     brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
+            //     messageMetadata: {
+            //         parent: url
+            //     },
+            // };
         }
+
         let inputInFocus = '';
         $('div.question-well').on('click', (e) => {
             let upcomingInput = $(e.currentTarget).find('input').attr('name');
@@ -405,7 +371,7 @@
             }
         })
         function main() {
-            function highlightBox(identifier) {
+            function highlightBox(identifier, eventTarget) {
                 if (!identifier) {
                     return
                 }
@@ -414,6 +380,9 @@
                     $('.question-well').removeClass('hasFocus')
                     let $questionWellToBeInFocus = $('.question-well').eq(questionNumber)
                     $questionWellToBeInFocus.addClass('hasFocus')
+                    if (eventTarget) {
+                        $questionWellToBeInFocus.find(`input[name=${eventTarget}]`).trigger('focus')
+                    }
                     inputInFocus = $questionWellToBeInFocus.find('input').attr('name')
                     $('html,body').animate({
                         scrollTop: $questionWellToBeInFocus.offset().top-200
@@ -423,12 +392,12 @@
                     $('.question-well').removeClass('hasFocus')
                 }
             }
-            function selectPreviousAnswer(parent, answer, type) {
+            function selectPreviousAnswer(parent, answer, inputType) {
                 if (parent && answer) {
                     const questionNumber = parent.charAt(parent.length - 1) - 1
-                    if (type) {
-                        $('.question-well').eq(questionNumber).find(`input[type=${type}]`).val(`${answer}`)
-                        $('.question-well').eq(questionNumber).find(`input[type=${type}]`).trigger('change')
+                    if (inputType) {
+                        $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).val(`${answer}`)
+                        $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).trigger('change')
                     } else {
                         $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click')
                     }
@@ -440,8 +409,9 @@
                     const { parent } = modifiedData;
                     const { answer } = modifiedData;
                     const { type } = modifiedData;
+                    const { focus } = modifiedData;
                     selectPreviousAnswer(parent, answer, type || '');
-                    highlightBox(modifiedData.question);
+                    highlightBox(modifiedData.question, focus);
                 }
             };
             window.addEventListener('message', receiveMessage, false);
@@ -450,7 +420,6 @@
                 div = $('#paiChatIframeEmbedTarget'),
                 win = $(window);
             $(document).scroll(compute).scroll();
-            $(window).resize(compute).resize();
             
             function compute() {
                 var spanHeight = span.outerHeight(),
@@ -475,12 +444,27 @@
             }
         };
         $( document ).ready(function() {
-            if (localStorage.getItem("lang")) {
-                console.log(localStorage.getItem("lang"))
-                selectLanguage(localStorage.getItem("lang"))
-            }
+            //if (localStorage.getItem("lang")) {
+                //selectLanguage(localStorage.getItem("lang"))
+            //}
         });
         main();
+    </script>
+    <script>
+        window.paiSettings = {
+            botId: '1028834855', // Your bot id. Required.
+            iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
+            iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
+            userMessageColor: '#00a09f', // Change the background color of the user message bubble.
+            verticalQuickReplies: true,
+            brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
+            messageMetadata: {
+                parent: url
+            },
+        };
+    </script>
+    <script>
+        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
     </script>
 </body>
 
