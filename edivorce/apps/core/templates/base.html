@@ -12,34 +12,8 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link type="text/css" rel="stylesheet" href="https://tars-stg.passage.ai/tars.css">
-
         <script>
-        const url = window.location.pathname;
-        // const shouldReset = (performance.navigation.type === 1 ? '' : '&resetHistory');
-        // window.paiSettings = {
-        //   botId: '1028834855', // Your bot id. Required. 3070164780 is the test bot.
-        //   // userId: 'loaderTest', // If a user is logged in, set the user id.
-        //   iframeEmbedTarget: 'paiChatIframeEmbedTarget', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-        //   iframeEmbedUrlParameters: '&debuggingmobilelayout20170918&mobilewebviewlayout&enableConsoleLogs' + shouldReset, // Append these to the src URL of the iframe.
-        //   messageMetadata: {
-        //       currentUrl: url,
-        //   },
-
-        // sendMessageToChat: {
-        //     message: 'Auto zurücksetzen auf ',
-        //     show: true
-        // },
-        // verticalQuickReplies: true,
-        //   // Enable Google Places Autocomplete by providing your API key here.
-        //   googlePlacesApiKey: 'AIzaSyBT0iLh95U4jfB926IQ7Z2_gLBai6MvSwA',
-
-        //   // Adds domain information to Google Analytics
-        //   // googleAnalyticsDomain: 'sampleDomain'
-
-        //   // enableSpeechRecognition: 'en-US'
-        // };
-        
+        const url = window.location.pathname;        
 
     </script>
         {% compress css %}
@@ -82,9 +56,9 @@
             color: inherit;
             background: none;
             cursor: pointer;
-            padding: 25px 80px;
+            padding: 10px 61px;
             display: inline-block;
-            margin: 15px 0;
+            margin: 7px 0;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 700;
@@ -94,7 +68,7 @@
             -moz-transition: all 0.3s;
             transition: all 0.3s;
             border-radius: 10px;
-            border: 3px solid #0e83cd;
+            border: 3px solid #365fbe66;
         }
         .language-selector-button:hover {
             color: white;
@@ -130,6 +104,68 @@
             position: fixed;
             width: 350px;
         }
+        .lds-ellipsis {
+            display: inline-block;
+            position: relative;
+            width: 64px;
+            height: 64px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 10000000;
+        }
+        .lds-ellipsis div {
+            position: absolute;
+            top: 27px;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #fff;
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+            border: 2px solid #365fbe;
+            padding: 6px;
+        }
+        .lds-ellipsis div:nth-child(1) {
+            left: 6px;
+            animation: lds-ellipsis1 0.6s infinite;
+        }
+        .lds-ellipsis div:nth-child(2) {
+            left: 6px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+        .lds-ellipsis div:nth-child(3) {
+            left: 26px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+        .lds-ellipsis div:nth-child(4) {
+            left: 45px;
+            animation: lds-ellipsis3 0.6s infinite;
+        }
+        @keyframes lds-ellipsis1 {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        @keyframes lds-ellipsis3 {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(0);
+            }
+        }
+        @keyframes lds-ellipsis2 {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(19px, 0);
+            }
+        }
+
     </style>
     </head>
     <body>
@@ -226,19 +262,31 @@
                     <div class="inbuilt-info">
                         <h2>More Information</h2>
                     </div>
-                    <!--  <div class="language-selector-wrapper">                    
+                    <div class="language-selector-wrapper">                    
                         <div class="language-selector">
                             <div class="language-content">
                                 <h4>Select Language</h4>
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('en')">Chinese</button>
+                                    <button class="language-selector-button" onclick="selectLanguage('en')">English</button>
                                 </div>
                                 <div class="language-selector-button-wrapper">
                                     <button class="language-selector-button" onclick="selectLanguage('fr')">French</button>
                                 </div>
+                                <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button" onclick="selectLanguage('zh')">Chinese Simplified</button>
+                                </div>
+                                <!--  <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button" onclick="selectLanguage('zh-tw')">Chinese TW</button>
+                                </div>  -->
+                                <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button" onclick="selectLanguage('pa')">Punjabi</button>
+                                </div>
+                                <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button" onclick="selectLanguage('es')">Spanish</button>
+                                </div>
                             </div>
                         </div>
-                    </div>  -->
+                    </div>
                     <button class="language-button" onclick="selectLanguage()">Change Language</button>
                     <!--  <iframe id="iframe-english" frameborder="0"></iframe>  -->
                     <div id="iframe-french" frameborder="0"></div>
@@ -324,7 +372,7 @@
             </div>
         </div>
 {% endif %}
-
+<div class="lds-ellipsis" style="display: none"><div></div><div></div><div></div><div></div></div>
         {% compress js %}
         <script type="text/javascript" src="{% static 'js/vendor/jquery-1.12.4.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
@@ -336,136 +384,59 @@
         <script type="text/javascript" src="{% static 'js/ajax.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
         {% endcompress %}
-
     <script>
-        let hidden = false
-        function selectLanguage(lang) {
-            // window.paiSettings = {
-            //     botId: '1028834855', // Your bot id. Required.
-            //     iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-            //     iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
-            //     userMessageColor: '#00a09f', // Change the background color of the user message bubble.
-            //     verticalQuickReplies: true,
-            //     brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
-            //     messageMetadata: {
-            //         parent: url
-            //     },
-            // };
-        }
-
-        let inputInFocus = '';
-        $('div.question-well').on('click', (e) => {
-            let upcomingInput = $(e.currentTarget).find('input').attr('name');
-            if (upcomingInput !== inputInFocus) {
-            console.log(upcomingInput + " - " + inputInFocus)
-                window.paiSettings.messageMetadata.previousQuestion = inputInFocus;
-                window.paiSettings.messageMetadata.nextQuestion = upcomingInput;
-                inputInFocus = upcomingInput
-                $('#iframe-french').find('iframe')[0].contentWindow.postMessage({
-                    paiSettings: window.paiSettings,
-                    sendMessageToChat: {
-                        message: 'Question changed',
-                        show: true
-                    }
-                }, 'https://tars-stg.passage.ai')
+        function loadPassageChat(lang) {
+            if (!lang) {
+                lang = 'en';
             }
-        })
-        function main() {
-            function highlightBox(identifier, eventTarget) {
-                if (!identifier) {
-                    return
-                }
-                if(identifier !== 'next') {
-                    const questionNumber = identifier.charAt(identifier.length - 1) - 1
-                    $('.question-well').removeClass('hasFocus')
-                    let $questionWellToBeInFocus = $('.question-well').eq(questionNumber)
-                    $questionWellToBeInFocus.addClass('hasFocus')
-                    if (eventTarget) {
-                        $questionWellToBeInFocus.find(`input[name=${eventTarget}]`).trigger('focus')
-                    }
-                    inputInFocus = $questionWellToBeInFocus.find('input').attr('name')
-                    $('html,body').animate({
-                        scrollTop: $questionWellToBeInFocus.offset().top-200
-                    }, 1000);
-                    
-                } else {
-                    $('.question-well').removeClass('hasFocus')
-                }
-            }
-            function selectPreviousAnswer(parent, answer, inputType) {
-                if (parent && answer) {
-                    const questionNumber = parent.charAt(parent.length - 1) - 1
-                    if (inputType) {
-                        $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).val(`${answer}`)
-                        $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).trigger('change')
-                    } else {
-                        $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click')
-                    }
-                }
-            }
-            function receiveMessage(msg) {
-                if (typeof msg.data == 'object') {
-                    const modifiedData = (msg.data);
-                    const { parent } = modifiedData;
-                    const { answer } = modifiedData;
-                    const { type } = modifiedData;
-                    const { focus } = modifiedData;
-                    selectPreviousAnswer(parent, answer, type || '');
-                    highlightBox(modifiedData.question, focus);
-                }
+            window.paiSettings = {
+                botId: '1028834855', // Your bot id. Required.
+                iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
+                iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs&language='+lang, // Append these to the src URL of the iframe.
+                userMessageColor: '#00a09f', // Change the background color of the user message bubble.
+                verticalQuickReplies: true,
+                brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
+                messageMetadata: {
+                    parent: url,
+                },
             };
-            window.addEventListener('message', receiveMessage, false);
+            (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
+        }
+        var language = localStorage.getItem('selectedLang');
+        loadPassageChat(language)
 
-            var span = $('#floating-side-menu'),
-                div = $('#paiChatIframeEmbedTarget'),
-                win = $(window);
-            $(document).scroll(compute).scroll();
-            
-            function compute() {
-                var spanHeight = span.outerHeight(),
-                    divHeight = div.height(),
-                    spanOffset = span.offset().top + spanHeight,
-                    divOffset = div.offset().top + divHeight;
-                //console.log(div.offset().top - $(document).scrollTop())
-                //console.log(span.offset().top - $(document).scrollTop())
-                if ((divOffset - $(document).scrollTop()+90) < window.innerHeight) {
-                    span.css("position", "absolute")
-                    span.css("top", "unset")
-                    span.css("bottom", "30px")
-                    // console.log("Voila")
-                }
-                //} else if (div.offset().top + 45 > span.offset().top) {
-                //  span.css("position", "absolute")
-                    //console.log("Voil 2 a")
-                else {
-                    // console.log("What")
-                    span.css("position", "fixed")
-                }
+        function selectLanguage(lang) {
+            if (lang) {
+                localStorage.setItem('selectedLang', lang);
+                window.location.href = window.location.href;
+                $('#progress-overlay').show()
+                $('.lds-ellipsis').show()
+                // $('.language-selector').hide();
+                // let src = $('#iframe-french').find('iframe').attr('src')
+                // //$('#iframe-french').find('iframe').attr('src', src.substring(0, src.length-2)+lang )
+                // window.paiSettings.messageMetadata = {
+                //     parent: url,
+                //     language: lang
+                // }
+                // window.paiSettings.iframeEmbedUrlParameters = '&resetHistory&enableconsolelogs&language='+lang
+                // $('#iframe-french').find('iframe')[0].contentWindow.postMessage({
+                //     paiSettings: window.paiSettings,
+                //     sendMessageToChat: {
+                //         message: 'Get started',
+                //         show: true
+                //     }
+                // }, 'https://tars-stg.passage.ai')
+
+                // console.log($('#iframe-french').find('iframe').attr('src'))
+            } else {
+                $('.language-selector').show()
             }
-        };
-        $( document ).ready(function() {
-            //if (localStorage.getItem("lang")) {
-                //selectLanguage(localStorage.getItem("lang"))
-            //}
-        });
-        main();
+        }
+        if (localStorage.getItem('selectedLang')) {
+            $('.language-selector').hide()
+        }
     </script>
-    <script>
-        window.paiSettings = {
-            botId: '1028834855', // Your bot id. Required.
-            iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-            iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs', // Append these to the src URL of the iframe.
-            userMessageColor: '#00a09f', // Change the background color of the user message bubble.
-            verticalQuickReplies: true,
-            brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
-            messageMetadata: {
-                parent: url
-            },
-        };
-    </script>
-    <script>
-        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
-    </script>
+    <script type="text/javascript" src="{% static 'js/paiImports.js' %}"></script>
 </body>
 
 </html>
