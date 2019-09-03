@@ -35,9 +35,6 @@
         .multi-select-button {
             white-space: normal !important;
         }
-        .inbuilt-info {
-            position: relative;
-        }
         .language-selector {
             position: absolute;
             right: 0;
@@ -70,9 +67,9 @@
             border-radius: 10px;
             border: 3px solid #365fbe66;
         }
-        .language-selector-button:hover {
+        .language-selector-button:hover, .language-selector-button.active {
             color: white;
-            background: #0e83cd;
+            background: #2b5580;
         }
 
         .language-button {
@@ -101,8 +98,15 @@
             min-height: 890px;
         }
         #floating-side-menu{
-            position: fixed;
             width: 350px;
+        }
+        .sticky {
+            position: fixed;
+            top: 110px;
+            width: 100%
+        }
+        .sidebar-text {
+            padding-top: 20px;
         }
         .lds-ellipsis {
             display: inline-block;
@@ -257,38 +261,45 @@
 
             {% block sidebar %}
             <div id="paiChatIframeEmbedTarget" class="col-flex more_information-column">
+                <a href="#" class="more_information-close"><i class="fa fa-times" aria-hidden="true"></i></a>
+                <h2>More Information</h2>
                 <div id="floating-side-menu">
-                    <a href="#" class="more_information-close"><i class="fa fa-times" aria-hidden="true"></i></a>
-                    <div class="inbuilt-info">
-                        <h2>More Information</h2>
-                    </div>
                     <div class="language-selector-wrapper">                    
                         <div class="language-selector">
                             <div class="language-content">
+                                <a href="javascript:void(0)" onclick="selectLanguage(localStorage.getItem('selectedLang'))"><i class="fa fa-times" aria-hidden="true" style="
+                                    position: absolute;
+                                    right: 20px;
+                                    font-size: large;"></i></a>
                                 <h4>Select Language</h4>
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('en')">English</button>
+                                    <button class="language-selector-button lang-default" onclick="selectLanguage('default', event)">English Default</button>
                                 </div>
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('fr')">French</button>
+                                    <button class="language-selector-button lang-en" onclick="selectLanguage('en', event)">English</button>
                                 </div>
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('zh')">Chinese Simplified</button>
+                                    <button class="language-selector-button lang-fr" onclick="selectLanguage('fr', event)">French</button>
+                                </div>
+                                <div class="language-selector-button-wrapper">
+                                    <button class="language-selector-button lang-zh" onclick="selectLanguage('zh', event)">Chinese Simplified</button>
                                 </div>
                                 <!--  <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('zh-tw')">Chinese TW</button>
+                                    <button class="language-selector-button lang-zh-tw" onclick="selectLanguage('zh-tw', event)">Chinese TW</button>
                                 </div>  -->
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('pa')">Punjabi</button>
+                                    <button class="language-selector-button lang-pa" onclick="selectLanguage('pa', event)">Punjabi</button>
                                 </div>
                                 <div class="language-selector-button-wrapper">
-                                    <button class="language-selector-button" onclick="selectLanguage('es')">Spanish</button>
+                                    <button class="language-selector-button lang-es" onclick="selectLanguage('es', event)">Spanish</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <button class="language-button" onclick="selectLanguage()">Change Language</button>
-                    <!--  <iframe id="iframe-english" frameborder="0"></iframe>  -->
+                    <div class="sidebar-text">
+                        {% block sidebarText%}{% endblock %}
+                    </div>
                     <div id="iframe-french" frameborder="0"></div>
                 </div>
             </div>
@@ -389,13 +400,15 @@
             if (!lang) {
                 lang = 'en';
             }
+            if (lang == 'default') {
+                return;
+            } 
             window.paiSettings = {
                 botId: '1028834855', // Your bot id. Required.
                 iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-                iframeEmbedUrlParameters: '&resetHistory&enableconsolelogs&language='+lang, // Append these to the src URL of the iframe.
-                userMessageColor: '#00a09f', // Change the background color of the user message bubble.
-                verticalQuickReplies: true,
-                brandColor: '#00a09f', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
+                iframeEmbedUrlParameters: '&resetHistory&verticalQuickReplies&enableconsolelogs&language='+lang, // Append these to the src URL of the iframe.
+                userMessageColor: '#2b5580', // Change the background color of the user message bubble.
+                brandColor: '#2b5580', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
                 messageMetadata: {
                     parent: url,
                 },
@@ -405,35 +418,31 @@
         var language = localStorage.getItem('selectedLang');
         loadPassageChat(language)
 
-        function selectLanguage(lang) {
+        function selectLanguage(lang, event) {
+            if (lang === localStorage.getItem('selectedLang')) {
+                $('.language-selector-wrapper').hide()
+                return;
+            }
             if (lang) {
                 localStorage.setItem('selectedLang', lang);
                 window.location.href = window.location.href;
                 $('#progress-overlay').show()
                 $('.lds-ellipsis').show()
-                // $('.language-selector').hide();
-                // let src = $('#iframe-french').find('iframe').attr('src')
-                // //$('#iframe-french').find('iframe').attr('src', src.substring(0, src.length-2)+lang )
-                // window.paiSettings.messageMetadata = {
-                //     parent: url,
-                //     language: lang
-                // }
-                // window.paiSettings.iframeEmbedUrlParameters = '&resetHistory&enableconsolelogs&language='+lang
-                // $('#iframe-french').find('iframe')[0].contentWindow.postMessage({
-                //     paiSettings: window.paiSettings,
-                //     sendMessageToChat: {
-                //         message: 'Get started',
-                //         show: true
-                //     }
-                // }, 'https://tars-stg.passage.ai')
-
-                // console.log($('#iframe-french').find('iframe').attr('src'))
             } else {
-                $('.language-selector').show()
+                $('.language-selector-wrapper').show()
             }
         }
         if (localStorage.getItem('selectedLang')) {
-            $('.language-selector').hide()
+            let lang = localStorage.getItem('selectedLang')
+            if (lang == 'default') {
+                $('.sidebar-text').show();
+                $('#floating-side-menu').removeClass('floating-chat')
+            } else {
+                $('.sidebar-text').hide();
+                $('#floating-side-menu').addClass('floating-chat')
+            }
+            $('.lang-'+lang).addClass('active');
+            $('.language-selector-wrapper').hide();
         }
     </script>
     <script type="text/javascript" src="{% static 'js/paiImports.js' %}"></script>

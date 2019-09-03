@@ -9,13 +9,15 @@
         'es': 'Pregunta modificada'
     }
     let inputInFocus = '';
+    let questionChanging = false;
     let currentLang = localStorage.getItem('selectedLang') || 'en'
     $('div.question-well').on('click', (e) => {
         let upcomingInput = $(e.currentTarget).find('input').attr('name');
         if (upcomingInput !== inputInFocus) {
             window.paiSettings.messageMetadata.previousQuestion = inputInFocus;
             window.paiSettings.messageMetadata.nextQuestion = upcomingInput;
-            inputInFocus = upcomingInput
+            inputInFocus = upcomingInput;
+            questionChanging = true;
             $('#iframe-french').find('iframe')[0].contentWindow.postMessage({
                 paiSettings: window.paiSettings,
                 sendMessageToChat: {
@@ -41,8 +43,7 @@
             inputInFocus = $questionWellToBeInFocus.find('input').attr('name')
             $('html,body').animate({
                 scrollTop: $questionWellToBeInFocus.offset().top-200
-            }, 1000);
-            
+            }, 100);
         } else {
             $('.question-well').removeClass('hasFocus')
         }
@@ -64,18 +65,33 @@
             const { parent } = modifiedData;
             const { answer } = modifiedData;
             const { type } = modifiedData;
-            const { focus } = modifiedData;
-            selectPreviousAnswer(parent, answer, type || '');
+            const focus = modifiedData.ID || modifiedData.focus;
+            if (!questionChanging) {
+                selectPreviousAnswer(parent, answer, type || '');
+            }
             highlightBox(modifiedData.question, focus);
+            questionChanging = false;
         }
     };
     window.addEventListener('message', receiveMessage, false);
 
-    var span = $('#floating-side-menu'),
-        div = $('#paiChatIframeEmbedTarget'),
-        win = $(window);
-    $(document).scroll(compute).scroll();
+    var span = document.querySelector('#floating-side-menu'),
+        div = document.querySelector('#paiChatIframeEmbedTarget h2'),
+        win = $(window),
+        sticky = div.getBoundingClientRect().bottom + window.scrollY;
+
+    if (span.classList.contains('floating-chat')) {
+        $(document).scroll(myFunction).scroll();
+    }
     
+    function myFunction() {
+        if (window.pageYOffset+90 > sticky) {
+            span.classList.add("sticky");
+        } else {
+            span.classList.remove("sticky");
+        }
+    }
+
     function compute() {
         var spanHeight = span.outerHeight(),
             divHeight = div.height(),
@@ -84,9 +100,8 @@
         //console.log(div.offset().top - $(document).scrollTop())
         //console.log(span.offset().top - $(document).scrollTop())
         if ((divOffset - $(document).scrollTop()+90) < window.innerHeight) {
-            span.css("position", "absolute")
+            span.css("position", "relative")
             span.css("top", "unset")
-            span.css("bottom", "30px")
             // console.log("Voila")
         }
         //} else if (div.offset().top + 45 > span.offset().top) {
