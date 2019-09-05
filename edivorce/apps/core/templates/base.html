@@ -406,7 +406,7 @@
             window.paiSettings = {
                 botId: '1028834855', // Your bot id. Required.
                 iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-                iframeEmbedUrlParameters: '&resetHistory&verticalQuickReplies&enableconsolelogs&language='+lang, // Append these to the src URL of the iframe.
+                iframeEmbedUrlParameters: '&resetHistory&verticalQuickReplies&enableSpeechRecognition=en-US&enableconsolelogs&language='+lang, // Append these to the src URL of the iframe.
                 userMessageColor: '#2b5580', // Change the background color of the user message bubble.
                 brandColor: '#2b5580', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
                 messageMetadata: {
@@ -443,6 +443,8 @@
             }
             $('.lang-'+lang).addClass('active');
             $('.language-selector-wrapper').hide();
+        } else {
+            $('.sidebar-text').hide();
         }
     </script>
     <script type="text/javascript" src="{% static 'js/paiImports.js' %}"></script>

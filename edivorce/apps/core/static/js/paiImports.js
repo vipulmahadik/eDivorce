@@ -59,6 +59,22 @@
             }
         }
     }
+    function selectCheckboxesOnPage(listOfOptions) {
+        let allCheckboxes = $('.checkbox-group input[type=checkbox]');
+        for (i = 0; i < allCheckboxes.length; i++) {
+            let toMarkAs = false;
+            let currentValue = allCheckboxes[i]
+            if (listOfOptions.includes(currentValue.value)) {
+                toMarkAs = true;
+            }
+            if (
+                (!$(allCheckboxes[i]).prop("checked") && toMarkAs ) ||
+                ($(allCheckboxes[i]).prop("checked") && !toMarkAs )
+            ) {
+                $(allCheckboxes[i]).trigger('click')
+            }
+        }
+    }
     function receiveMessage(msg) {
         if (typeof msg.data == 'object') {
             const modifiedData = (msg.data);
@@ -66,8 +82,12 @@
             const { answer } = modifiedData;
             const { type } = modifiedData;
             const focus = modifiedData.ID || modifiedData.focus;
+            const { multi_select } = modifiedData;
             if (!questionChanging) {
                 selectPreviousAnswer(parent, answer, type || '');
+            }
+            if (multi_select) {
+                selectCheckboxesOnPage(multi_select);
             }
             highlightBox(modifiedData.question, focus);
             questionChanging = false;
@@ -81,35 +101,14 @@
         sticky = div.getBoundingClientRect().bottom + window.scrollY;
 
     if (span.classList.contains('floating-chat')) {
-        $(document).scroll(myFunction).scroll();
+        $(document).scroll(sidebarScrollHandler).scroll();
     }
     
-    function myFunction() {
+    function sidebarScrollHandler() {
         if (window.pageYOffset+90 > sticky) {
             span.classList.add("sticky");
         } else {
             span.classList.remove("sticky");
-        }
-    }
-
-    function compute() {
-        var spanHeight = span.outerHeight(),
-            divHeight = div.height(),
-            spanOffset = span.offset().top + spanHeight,
-            divOffset = div.offset().top + divHeight;
-        //console.log(div.offset().top - $(document).scrollTop())
-        //console.log(span.offset().top - $(document).scrollTop())
-        if ((divOffset - $(document).scrollTop()+90) < window.innerHeight) {
-            span.css("position", "relative")
-            span.css("top", "unset")
-            // console.log("Voila")
-        }
-        //} else if (div.offset().top + 45 > span.offset().top) {
-        //  span.css("position", "absolute")
-            //console.log("Voil 2 a")
-        else {
-            // console.log("What")
-            span.css("position", "fixed")
         }
     }
 })()
