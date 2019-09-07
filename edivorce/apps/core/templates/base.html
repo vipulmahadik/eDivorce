@@ -415,7 +415,9 @@
                 brandColor: '#2b5580', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
                 messageMetadata: preparedMeta,
             };
-            (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}})();
+            (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}
+            window.setTimeout(function () {document.getElementsByTagName('iframe')[0].allow = "microphone;"; window.paiUpdatePaiSettingsInIframeEmbed()}, 4000)
+            })();
         }
         var language = localStorage.getItem('selectedLang');
         loadPassageChat(language)
