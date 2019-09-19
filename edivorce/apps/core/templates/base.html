@@ -145,6 +145,9 @@
             left: 45px;
             animation: lds-ellipsis3 0.6s infinite;
         }
+        .question-focus, .table-cell-active {
+            border: 4px solid #2b5580 !important;
+        }
         @keyframes lds-ellipsis1 {
             0% {
                 transform: scale(0);
@@ -396,31 +399,6 @@
         <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
         {% endcompress %}
     <script>
-        function loadPassageChat(lang) {
-            if (!lang) {
-                lang = 'en';
-            }
-            if (lang == 'default') {
-                return;
-            } 
-            let preparedMeta = {
-                parent: url,
-            };
-            window.paiSettings = {
-                botId: '1028834855', // Your bot id. Required.
-                iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
-                iframeEmbedUrlParameters: `&resetHistory&verticalQuickReplies&enableSpeechRecognition=en-US&enableconsolelogs&language=${lang}&messagemetadata=${JSON.stringify(preparedMeta)}`, // Append these to the src URL of the iframe.
-                enableSpeechRecognition: 'en-US',
-                userMessageColor: '#2b5580', // Change the background color of the user message bubble.
-                brandColor: '#2b5580', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
-                messageMetadata: preparedMeta,
-            };
-            (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}
-            window.setTimeout(function () {document.getElementsByTagName('iframe')[0].allow = "microphone;"; window.paiUpdatePaiSettingsInIframeEmbed()}, 4000)
-            })();
-        }
-        var language = localStorage.getItem('selectedLang');
-        loadPassageChat(language)
 
         function selectLanguage(lang, event) {
             if (lang === localStorage.getItem('selectedLang')) {

@@ -1,4 +1,48 @@
 (function(){
+
+    let questionSteps = [];
+    function loadPassageChat(lang) {
+        if (!lang) {
+            lang = 'en';
+        }
+        if (lang == 'default') {
+            return;
+        } 
+        let preparedMeta = {
+            parent: url,
+            pageData: questionSteps
+        };
+        window.paiSettings = {
+            botId: '1028834855', // Your bot id. Required.
+            iframeEmbedTarget: 'iframe-french', // Enable the embedded iframe mode by passing the ID of the parent element for the iframe.
+            iframeEmbedUrlParameters: `&resetHistory&verticalQuickReplies&enableSpeechRecognition=en-US&enableconsolelogs&language=${lang}&messagemetadata=${JSON.stringify(preparedMeta)}`, // Append these to the src URL of the iframe.
+            enableSpeechRecognition: 'en-US',
+            userMessageColor: '#2b5580', // Change the background color of the user message bubble.
+            brandColor: '#2b5580', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
+            messageMetadata: preparedMeta,
+        };
+        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}
+        window.setTimeout(function () {document.getElementsByTagName('iframe')[0].allow = "microphone;"; window.paiUpdatePaiSettingsInIframeEmbed()}, 4000)
+        })();
+    }
+    var language = localStorage.getItem('selectedLang');
+
+    $('.question-well').each((index, li) => {
+        let currentSection = $(li);
+        let dataFromThisDiv = {
+            name: [],
+            visibility: $(li).is(':visible')
+        };
+        currentSection.find('input').each((i, inp) => {
+            if (!dataFromThisDiv.name.includes($(inp).attr('name'))) {
+                dataFromThisDiv.name.push($(inp).attr('name'));
+            }
+        })
+        questionSteps.push(dataFromThisDiv);
+    })
+    loadPassageChat(language)
+
+
     let hidden = false
     let questionChangeText = {
         'en': 'Question changed',
@@ -10,8 +54,12 @@
     }
     let inputInFocus = '';
     let questionChanging = false;
+    let dontTriggerClickFunction = false;
     let currentLang = localStorage.getItem('selectedLang') || 'en'
     $('div.question-well').on('click', (e) => {
+        if (dontTriggerClickFunction) {
+            return
+        }
         let upcomingInput = $(e.currentTarget).find('input').attr('name');
         if (upcomingInput !== inputInFocus) {
             window.paiSettings.messageMetadata.previousQuestion = inputInFocus;
@@ -28,21 +76,30 @@
         }
     })
 
-    function highlightBox(identifier, eventTarget) {
+    function highlightBox(identifier, eventTarget, questionToHighlight) {
         if (!identifier) {
             return
         }
         if(identifier !== 'next') {
-            const questionNumber = identifier.charAt(identifier.length - 1) - 1
+            const questionNumber = identifier.charAt(identifier.length - 1) - 1 
             $('.question-well').removeClass('hasFocus')
             let $questionWellToBeInFocus = $('.question-well').eq(questionNumber)
+            let scrollValue = $questionWellToBeInFocus.offset().top - 400
             $questionWellToBeInFocus.addClass('hasFocus')
             if (eventTarget) {
                 $questionWellToBeInFocus.find(`input[name=${eventTarget}]`).trigger('focus')
+                scrollValue = $questionWellToBeInFocus.find(`input[name=${eventTarget}]`).offset().top - 400;
             }
             inputInFocus = $questionWellToBeInFocus.find('input').attr('name')
+            $questionWellToBeInFocus.find('.question-focus').removeClass('question-focus');
+            if (questionToHighlight) {
+                $questionWellToBeInFocus.find(`input[name=${questionToHighlight}]`).closest('tr').find('.fact-sheet-question').addClass('question-focus');
+            }
+            if (questionToHighlight) {
+                scrollValue = $('.question-focus').offset().top - 400;
+            }
             $('html,body').animate({
-                scrollTop: $questionWellToBeInFocus.offset().top-200
+                scrollTop: scrollValue
             }, 100);
         } else {
             $('.question-well').removeClass('hasFocus')
@@ -55,7 +112,9 @@
                 $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).val(`${answer}`)
                 $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).trigger('change')
             } else {
-                $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click')
+                dontTriggerClickFunction = true;
+                $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click');
+                dontTriggerClickFunction = false;
             }
         }
     }
@@ -75,6 +134,17 @@
             }
         }
     }
+
+    function clickOnThis(onThisSelector) {
+        dontTriggerClickFunction = true;
+        if ($(onThisSelector).is(':visible')) {
+            $(onThisSelector).trigger('click');
+        } else {
+            console.log(`Click triggered on a hidden element. Selector is ${onThisSelector}`)
+        }
+        dontTriggerClickFunction = false;
+    }
+
     function receiveMessage(msg) {
         if (typeof msg.data == 'object') {
             const modifiedData = (msg.data);
@@ -83,13 +153,22 @@
             const { type } = modifiedData;
             const focus = modifiedData.ID || modifiedData.focus;
             const { multi_select } = modifiedData;
+            const { click_selector } = modifiedData;
+            const { highlight_the_question } = modifiedData;
+
+            console.log(modifiedData)
+            if (click_selector) {
+                clickOnThis(click_selector);
+            }
             if (!questionChanging) {
                 selectPreviousAnswer(parent, answer, type || '');
             }
             if (multi_select) {
                 selectCheckboxesOnPage(multi_select);
             }
-            highlightBox(modifiedData.question, focus);
+            if (modifiedData.question) {
+                highlightBox(modifiedData.question, focus, highlight_the_question);
+            }
             questionChanging = false;
         }
     };
@@ -111,5 +190,4 @@
             span.classList.remove("sticky");
         }
     }
-})()
-    
+})();
