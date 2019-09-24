@@ -1,6 +1,6 @@
 (function(){
 
-    let questionSteps = [];
+    let questionSteps = {};
     function loadPassageChat(lang) {
         if (!lang) {
             lang = 'en';
@@ -21,27 +21,20 @@
             brandColor: '#2b5580', // Change text and highlight color. Any valid CSS color. Also changes shadow of cta button! Default 'rgb(17, 151, 255)'.
             messageMetadata: preparedMeta,
         };
-        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}
-        window.setTimeout(function () {document.getElementsByTagName('iframe')[0].allow = "microphone;"; window.paiUpdatePaiSettingsInIframeEmbed()}, 4000)
+        (function(){var w=window;var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.PassageAI=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://tars-stg.passage.ai/loader.min.js?language=fr&botId='+window.paiSettings.botId;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}l()
         })();
     }
     var language = localStorage.getItem('selectedLang');
 
-    $('.question-well').each((index, li) => {
-        let currentSection = $(li);
-        let dataFromThisDiv = {
-            name: [],
-            visibility: $(li).is(':visible')
-        };
-        currentSection.find('input').each((i, inp) => {
-            if (!dataFromThisDiv.name.includes($(inp).attr('name'))) {
-                dataFromThisDiv.name.push($(inp).attr('name'));
+    $(window).on('load', function() {
+        $("div[class^='question-well']").each((index, li) => {
+            if ($(li).attr('id')) {
+                let isVisible = $(li).css('display') === 'block' ? true : false;
+                questionSteps[$(li).attr('id')] = isVisible
             }
         })
-        questionSteps.push(dataFromThisDiv);
-    })
-    loadPassageChat(language)
-
+        loadPassageChat(language)
+    });
 
     let hidden = false
     let questionChangeText = {
