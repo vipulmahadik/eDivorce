@@ -35,12 +35,15 @@
         })
         loadPassageChat(language)
     });
-
+    $("input[name='number_children_over_19']").on('input', (e) => {
+        window.paiSettings.messageMetadata.number_children_over_19 = parseInt(e.target.value)
+        window.paiUpdatePaiSettingsInIframeEmbed()
+    })
     let hidden = false
     let questionChangeText = {
         'en': 'Question changed',
         'pa': 'ਸਵਾਲ ਬਦਲਿਆ',
-        'zh': '问题已更改变',
+        'zh-CN': '问题已更改变',
         'zh-tw': '问题已更改变',
         'fr': 'La question a été modifiée',
         'es': 'Pregunta modificada'
