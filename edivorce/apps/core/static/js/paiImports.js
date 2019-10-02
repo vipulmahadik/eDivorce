@@ -1,6 +1,10 @@
 (function(){
 
     let questionSteps = {};
+    const pagesHavingDifferentFocus = [
+        '/question/children/income_expenses/',
+        '/question/children/facts/'
+    ]
     function loadPassageChat(lang) {
         if (!lang) {
             lang = 'en';
@@ -57,6 +61,9 @@
             return
         }
         let upcomingInput = $(e.currentTarget).find('input').attr('name');
+        if (!upcomingInput) {
+            upcomingInput = $(e.currentTarget).find('textarea').attr('name');
+        }
         if (upcomingInput !== inputInFocus) {
             window.paiSettings.messageMetadata.previousQuestion = inputInFocus;
             window.paiSettings.messageMetadata.nextQuestion = upcomingInput;
@@ -83,13 +90,13 @@
             let scrollValue = $questionWellToBeInFocus.offset().top - 400
             $questionWellToBeInFocus.addClass('hasFocus')
             if (eventTarget) {
-                $questionWellToBeInFocus.find(`input[name=${eventTarget}]`).trigger('focus')
-                scrollValue = $questionWellToBeInFocus.find(`input[name=${eventTarget}]`).offset().top - 400;
+                $questionWellToBeInFocus.find(`[name=${eventTarget}]`).trigger('focus')
+                scrollValue = $questionWellToBeInFocus.find(`[name=${eventTarget}]:visible`).offset().top - 400;
             }
             inputInFocus = $questionWellToBeInFocus.find('input').attr('name')
             $questionWellToBeInFocus.find('.question-focus').removeClass('question-focus');
             if (questionToHighlight) {
-                $questionWellToBeInFocus.find(`input[name=${questionToHighlight}]`).closest('tr').find('.fact-sheet-question').addClass('question-focus');
+                $questionWellToBeInFocus.find(`[name=${questionToHighlight}]`).closest('tr').find('.fact-sheet-question').addClass('question-focus');
             }
             if (questionToHighlight) {
                 scrollValue = $('.question-focus').offset().top - 400;
@@ -105,8 +112,8 @@
         if (parent && answer) {
             const questionNumber = parent.charAt(parent.length - 1) - 1
             if (inputType) {
-                $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).val(`${answer}`)
-                $('.question-well').eq(questionNumber).find(`input[type=${inputType}]`).trigger('change')
+                $('.question-well').eq(questionNumber).find(`[type=${inputType}]`).val(`${answer}`)
+                $('.question-well').eq(questionNumber).find(`[type=${inputType}]`).trigger('change')
             } else {
                 dontTriggerClickFunction = true;
                 $('.question-well').eq(questionNumber).find(`input:radio[value='${answer}']`).trigger('click');
@@ -115,7 +122,7 @@
         }
     }
     function selectCheckboxesOnPage(listOfOptions) {
-        let allCheckboxes = $('.checkbox-group input[type=checkbox]');
+        let allCheckboxes = $('.checkbox-group input[name='+ inputInFocus +'][type=checkbox]');
         for (i = 0; i < allCheckboxes.length; i++) {
             let toMarkAs = false;
             let currentValue = allCheckboxes[i]
@@ -141,6 +148,35 @@
         dontTriggerClickFunction = false;
     }
 
+    function scrollToFocus(focusOnThis, answer) {
+        if (focusOnThis) {
+            dontTriggerClickFunction = true;
+            $('.table-row-active').removeClass('table-row-active')
+            let elementToFocus = $(`[name=${focusOnThis}]`);
+            if(elementToFocus.closest('td')) {
+                elementToFocus.closest('tr').addClass('table-row-active')
+            }
+            if (answer) {
+                $(`${answer}`).trigger('click')
+                $(`${answer}`).trigger('change')
+            } else {
+                elementToFocus.trigger('focus')
+                console.log(elementToFocus.closest('.question-well'))
+                elementToFocus.closest('.question-well').trigger('click')
+
+
+                // if(document.activeElement == document.getElementsByTagName("iframe")[0]) {
+                //     console.log('iframe has focus');
+                //     $('html,body').animate({
+                //         scrollTop: elementToFocus.offset().top - 400
+                //     }, 100);
+                // } else {
+                // }
+            }
+            dontTriggerClickFunction = false;
+        }
+    }
+
     function receiveMessage(msg) {
         if (typeof msg.data == 'object') {
             const modifiedData = (msg.data);
@@ -162,8 +198,12 @@
             if (multi_select) {
                 selectCheckboxesOnPage(multi_select);
             }
-            if (modifiedData.question) {
-                highlightBox(modifiedData.question, focus, highlight_the_question);
+            if (pagesHavingDifferentFocus.includes(url)) {
+                scrollToFocus(focus, answer)
+            } else {
+                if (modifiedData.question) {
+                    highlightBox(modifiedData.question, focus, highlight_the_question);
+                }
             }
             questionChanging = false;
         }
